@@ -1,0 +1,11 @@
+Heroku (evening-beach-3558)
+Blog: ligustrum
+Mail: andre.m.de.albuquerque@gmail.com
+Login: admin
+Password: PrTZxzf
+
+Local
+Blog: ulmeiro
+Mail: andre.m.de.albuquerque@gmail.com
+Login: admin
+Password: BBQrMy0

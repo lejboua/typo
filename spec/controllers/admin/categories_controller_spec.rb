@@ -34,6 +34,16 @@ describe Admin::CategoriesController do
     end
   end
 
+  it "test_new" do
+    get :new
+    # @category filled with a new category
+    assigns(:category).should_not be_nil
+    # @category should not be valid (hasn't been filled)
+    assert assigns(:category).valid? == false
+    assigns(:categories).should_not be_nil
+    assert_template 'new'
+  end
+
   it "test_update" do
     post :edit, :id => Factory(:category).id
     assert_response :redirect, :action => 'index'
@@ -62,5 +72,6 @@ describe Admin::CategoriesController do
 
     assert_raise(ActiveRecord::RecordNotFound) { Category.find(test_id) }
   end
+
   
 end

@@ -29,7 +29,7 @@ Feature: Merge Articles
     Then the article "Foobar" should have body "Lorem Ipsum Lorem Ipsum 2"
     # 3. When articles are merged, the merged article should have one author
     # (either one of the authors of the original article).
-    And I should be on the article page for "Foobar"
+    And I should be on the admin index page
 
   Scenario: Successfully merge articles (merged article has one author - author from one of the original articles)
     Given I am logged into the admin panel
@@ -39,7 +39,7 @@ Feature: Merge Articles
     # 3. When articles are merged, the merged article should have one author
     # (either one of the authors of the original article).
     Then the article "Foobar" should have author "Legolas"
-    And I should be on the article page for "Foobar"
+    And I should be on the admin index page
 
   Scenario: Successfully merge articles (comments on each of the two original articles need to carry over and point to the new, merged article.)
     Given I am logged into the admin panel
@@ -49,7 +49,7 @@ Feature: Merge Articles
     # 4. Comments on each of the two original articles need
     # to all carry over and point to the new, merged article.
     Then the article "Foobar" should have author "Legolas"
-    And I should be on the article page for "Foobar"
+    And I should be on the admin index page
 
   Scenario: A non-admin cannot merge two articles
     Given I am logged in as "Frodo" into the admin panel

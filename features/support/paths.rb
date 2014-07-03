@@ -21,6 +21,9 @@ module NavigationHelpers
     when /^the admin page$/
       '/admin'
 
+    when /^the admin index page$/
+      '/admin/content'
+
     when /^the categories page$/
       '/admin/categories/new'
 

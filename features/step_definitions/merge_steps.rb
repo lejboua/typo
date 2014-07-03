@@ -4,8 +4,9 @@ Given /^the following articles exist$/ do |articles|
   #     | 2  | Foobar   | Lorem Ipsum   | Legolas  |
   #     | 3  | Foobar 2 | Lorem Ipsum 2 | Frodo    |
   articles.hashes.each do |article|
-    author = User.find_by_name(article[:user])
-    article['user'] = author
+    author = User.find_by_name(article[:user].downcase)
+    article[:user] = author
+    article[:author] = author
     # 14/03/07 06:38:32, AA: It doesn't set the IDs
     a = Article.create(article)
   end
@@ -60,7 +61,10 @@ When /^(?:|I )fill in "([^"]*)" with the id of the article with title "([^"]*)"$
 end
 
 Then /^the article "(.*?)" should have author "(.*?)"$/ do |title, author_name|
-  Article.find_by_title(title).user.name.should eq author_name
+  article = Article.find_by_title(title)
+  author = User.find_by_name(author_name.downcase)
+  article.author.should eq author.id.to_s
+  # Article.find_by_title(title).author.name.should eq author_name
 end
 
 Then /^the "([^"]*)" field(?: within (.*))? should not exist$/ do |field, parent|

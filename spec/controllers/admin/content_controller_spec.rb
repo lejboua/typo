@@ -631,14 +631,13 @@ describe Admin::ContentController do
       it 'should allow admins to merge articles' do
         @article_first = Factory(:article, :user => @author1, :title => 'first_title', :body => 'first_body')
         @article_to_merge = Factory(:article, :user => @author2, :title => 'second_title', :body => 'second_body')
-        # debugger
         Article.stub(:merge_articles).with(@article_first.id, @article_to_merge.id)
-        post :merge_with, 'id' => @article_first.id, 'other_id' => @article_to_merge.id
+        post :merge_with, 'current_article_id' => @article_first.id, 'merge_with' => @article_to_merge.id
         # redirect to the new article created by merging the two previous articles
         response.should redirect_to(:action => 'index')
-        request.flash[:error].should be_empty
+        request.flash[:error].should be_nil
         request.flash[:notice].should_not be_nil
-        request.flash[:notice].should eq("Articles were successfully merged.")
+        request.flash[:notice].should eq("The articles were merged successfully")
       end
     end
   end
@@ -716,7 +715,8 @@ describe Admin::ContentController do
         @article_first = Factory(:article)
         @article_to_merge = Factory(:article)
         post :merge_with, 'id' => @article_first.id, 'other_id' => @article_to_merge.id
-        response.should redirect_to(:action => 'edit')
+        response.should redirect_to(:action => 'index')
+        request.flash[:error].should_not be_nil
         request.flash[:error].should_not be_empty
         request.flash[:error].should contain 'not allowed to'
     end

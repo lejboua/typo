@@ -29,6 +29,8 @@ class Admin::ContentController < Admin::BaseController
 
   def edit
     @article = Article.find(params[:id])
+    # used to show/hide the merge_with form
+    @show_merge_with = current_user.profile.label == Profile::ADMIN
     unless @article.access_by? current_user
       redirect_to :action => 'index'
       flash[:error] = _("Error, you are not allowed to perform this action")
@@ -38,14 +40,21 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def merge_with
-    debugger
     unless current_user.admin?
       redirect_to :action => 'index'
       flash[:error] = _("Error, you are not allowed to perform this action")
       return
     end
+    unless params[:current_article_id] != params[:merge_with]
+      redirect_to :action => 'index'
+      flash[:error] = _("Error, can't merge an article with itself")
+      return
+    end
+
     article_first = Article.find_by_id(params[:current_article_id])
-    article_to_merge = Article.find_by_id(params[:other_id])
+    article_to_merge = Article.find_by_id(params[:merge_with])
+
+    article_first.merge_with(article_to_merge)
 
     unless !article_first.nil? && !article_to_merge.nil?
       redirect_to :action => 'index'

@@ -416,6 +416,49 @@ class Article < Content
     user.admin? || user_id == user.id
   end
 
+  def merge_with(article_to_merge)
+    # puts '############################## ARRIVED ON Article.merge_with ##############################'
+    # debugger
+    merged_article = Article.get_or_build_article(nil)
+    # When articles are merged, the merged article should contain the text of both previous articles.
+    merged_article.body = self.body + " " + article_to_merge.body
+    # When articles are merged, the merged article should have one author (either one of the authors of the original article).
+    merged_article.author = self.author
+    # Comments on each of the two original articles need to all carry over and point to the new, merged article.
+    # TODO
+    # The title of the new article should be the title from either one of the merged articles.
+    merged_article.title = self.title
+
+    # percorre cada comentario e atribui-o
+    # ao novo merged_article
+    self.comments.each { |comment|
+      comment.article = merged_article; comment.save
+    }
+    # percorre cada comentario e atribui-o
+    # ao novo merged_article
+    article_to_merge.comments.each { |comment|
+      comment.article = merged_article; comment.save
+    }
+
+    # persiste na BD com os comentarios antigos
+    merged_article.save
+
+    # faz refresh do current Article e do article_to_merge para que venha
+    # da BD sem os comments
+    self.reload
+    article_to_merge.reload
+
+    # agora que ja fez refresh dos artigos que foram merged
+    # e estes ja nao tem comments, eliminamo-los
+    self.destroy
+    article_to_merge.destroy
+
+    # puts "############################## " +
+      "RETURNING FROM Article.merge_with (NEW ID:#{merged_article.id}) " +
+      "##############################"
+    return merged_article
+  end
+
   protected
 
   def set_published_at

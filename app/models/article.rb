@@ -421,14 +421,15 @@ class Article < Content
     # debugger
     merged_article = Article.get_or_build_article(nil)
     # When articles are merged, the merged article should contain the text of both previous articles.
-    merged_article.body = self.body + " " + article_to_merge.body
+    merged_article.body = self.body + article_to_merge.body
     # When articles are merged, the merged article should have one author (either one of the authors of the original article).
     merged_article.author = self.author
-    # Comments on each of the two original articles need to all carry over and point to the new, merged article.
-    # TODO
+    merged_article.user = self.user
+
     # The title of the new article should be the title from either one of the merged articles.
     merged_article.title = self.title
 
+    # Comments on each of the two original articles need to all carry over and point to the new, merged article.
     # percorre cada comentario e atribui-o
     # ao novo merged_article
     self.comments.each { |comment|

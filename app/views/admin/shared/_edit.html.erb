@@ -5,11 +5,10 @@
   <%= render :partial => "form" %>
 
 <% end %>
-<!-- @show_merge_with = current_user.profile.label == Profile::ADMIN -->
-<% if @show_merge_with %>
+<% if @show_merge_with == true %>
   <div class="merge-articles">
       <%= form_tag(:action => "merge_with", :method => "post") do %>
-        <p>merge articles</p>
+        <h3>Merge Articles</h3>
         <%= _("Article ID") %> <%= text_field_tag 'merge_with', nil, :class => 'large' %>
         <input type="hidden" name="current_article_id" id="current_article_id" value="<%= @article.id %>">
         <%= submit_tag 'Merge' %>

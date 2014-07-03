@@ -51,17 +51,16 @@ class Admin::ContentController < Admin::BaseController
       return
     end
 
+    article_first = Article.find_by_id(params[:current_article_id])
+    article_to_merge = Article.find_by_id(params[:merge_with])
+
     unless !article_first.nil? && !article_to_merge.nil?
       redirect_to :action => 'index'
       flash[:error] = _("Error, at least one of the articles doesn't exist")
       return
     end
 
-    article_first = Article.find_by_id(params[:current_article_id])
-    article_to_merge = Article.find_by_id(params[:merge_with])
-
     article_first.merge_with(article_to_merge)
-
 
     flash[:notice] = _("The articles were merged successfully")
     redirect_to :action => 'index'

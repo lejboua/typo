@@ -37,6 +37,26 @@ class Admin::ContentController < Admin::BaseController
     new_or_edit
   end
 
+  def merge_with
+    debugger
+    unless current_user.admin?
+      redirect_to :action => 'index'
+      flash[:error] = _("Error, you are not allowed to perform this action")
+      return
+    end
+    article_first = Article.find_by_id(params[:current_article_id])
+    article_to_merge = Article.find_by_id(params[:other_id])
+
+    unless !article_first.nil? && !article_to_merge.nil?
+      redirect_to :action => 'index'
+      flash[:error] = _("Error, at least one of the articles doesn't exist")
+      return
+    end
+
+    flash[:notice] = _("The articles were merged successfully")
+    redirect_to :action => 'index'
+  end
+
   def destroy
     @record = Article.find(params[:id])
 

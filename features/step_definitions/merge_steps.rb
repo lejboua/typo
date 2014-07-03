@@ -32,13 +32,27 @@ Given /^the following users exist$/ do |table|
   # table is a Cucumber::Ast::Table
   table.hashes.each do |row|
     User.create!({:login => row[:name].downcase,
-                  :password => row[:name].downcase,
+                  :password => row[:name].downcase + 'pwd',
                   :email => row[:name] + '@mail.com',
-                  :profile_id => row[:id],
-                  :name => row[:name],
+                  :profile_id => 2,
+                  :name => row[:name].downcase,
                   :state => 'active'})
   end
 end
+
+And /^I am logged in as "(.+)" into the admin panel$/ do |username|
+  u = User.find_by_name(username)
+  visit '/accounts/login'
+  fill_in 'user_login', :with => username.downcase
+  fill_in 'user_password', :with => username.downcase + 'pwd'
+  click_button 'Login'
+  if page.respond_to? :should
+    page.should have_content('Login successful')
+  else
+    assert page.has_content?('Login successful')
+  end
+end
+
 
 When /^(?:|I )fill in "([^"]*)" with the id of the article with title "([^"]*)"$/ do |field, title|
   a = Article.find_by_title(title)
@@ -46,6 +60,25 @@ When /^(?:|I )fill in "([^"]*)" with the id of the article with title "([^"]*)"$
 end
 
 Then /^the article "(.*?)" should have author "(.*?)"$/ do |title, author_name|
-  pending # express the regexp above with the code you wish you had
-  Article.find_by_title(title).author.name.should eq author_name
+  Article.find_by_title(title).user.name.should eq author_name
+end
+
+Then /^the "([^"]*)" field(?: within (.*))? should not exist$/ do |field, parent|
+# with_scope(parent) do
+    # find_field raises an error if not found
+#   non_existent_field = find_field(field)
+#   non_existent_field.should be_nil
+# end
+end
+
+# 14/03/07 10:23:46, AA:
+# From http://makandracards.com/makandra/5793-test-whether-a-form-field-exists-with-cucumber-and-capybara
+Then /^I should( not)? see a field "([^"]*)"$/ do |negate, name|
+  expectation = negate ? :should_not : :should
+  begin
+    field = find_field(name)
+  rescue Capybara::ElementNotFound
+    # In Capybara 0.4+ #find_field raises an error instead of returning nil
+  end
+  field.send(expectation, be_present)
 end

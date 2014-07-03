@@ -3,6 +3,9 @@ Blog: ligustrum
 Mail: andre.m.de.albuquerque@gmail.com
 Login: admin
 Password: PrTZxzf
+Users:
+- blogpublisher, pass: blogpublisher (can't edit previous articles)
+- contributor, pass: contributor (in the dashboard doesn't have any options menu available)
 
 Local
 Blog: ulmeiro

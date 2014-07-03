@@ -473,6 +473,18 @@ describe Admin::ContentController do
       @user.editor = 'simple'
       @user.save
       @article = Factory(:article)
+
+      # debugger
+      publisher_profile = Factory(:profile_publisher)
+      @author1 = Factory(:user, :text_filter => Factory(:markdown), :profile => publisher_profile)
+      # 14/03/07 11:49:20, AA: is it needed?
+      @author1.editor = 'simple'
+      @author1.save
+
+      @author2 = Factory(:user, :text_filter => Factory(:markdown), :profile => publisher_profile)
+      @author2.editor = 'simple'
+      @author2.save
+
       request.session = { :user => @user.id }
     end
 
@@ -607,6 +619,28 @@ describe Admin::ContentController do
       end
     end
 
+    describe 'merge_with action' do
+      it 'should show the merge articles form to admins' do
+        # debugger
+        get :edit, 'id' => @article.id
+        response.should render_template('new')
+        response.body.should have_field("merge_with")
+        response.body.should have_submit_button("Merge")
+      end
+
+      it 'should allow admins to merge articles' do
+        @article_first = Factory(:article, :user => @author1, :title => 'first_title', :body => 'first_body')
+        @article_to_merge = Factory(:article, :user => @author2, :title => 'second_title', :body => 'second_body')
+        # debugger
+        Article.stub(:merge_articles).with(@article_first.id, @article_to_merge.id)
+        post :merge_with, 'id' => @article_first.id, 'other_id' => @article_to_merge.id
+        # redirect to the new article created by merging the two previous articles
+        response.should redirect_to(:action => 'index')
+        request.flash[:error].should be_empty
+        request.flash[:notice].should_not be_nil
+        request.flash[:notice].should eq("Articles were successfully merged.")
+      end
+    end
   end
 
   describe 'with publisher connection' do
@@ -669,6 +703,22 @@ describe Admin::ContentController do
         end.should_not change(Article, :count)
       end
 
+    end
+
+    it 'should not show the merge articles form to non-admins' do
+        get :edit, 'id' => @article.id
+        response.should render_template('new')
+        response.body.should_not have_field("merge_with")
+        response.body.should_not have_submit_button("Merge")
+    end
+
+    it 'should not allow non-admins to merge articles' do
+        @article_first = Factory(:article)
+        @article_to_merge = Factory(:article)
+        post :merge_with, 'id' => @article_first.id, 'other_id' => @article_to_merge.id
+        response.should redirect_to(:action => 'edit')
+        request.flash[:error].should_not be_empty
+        request.flash[:error].should contain 'not allowed to'
     end
   end
 end

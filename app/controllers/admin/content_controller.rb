@@ -31,7 +31,6 @@ class Admin::ContentController < Admin::BaseController
     @article = Article.find(params[:id])
     # used to show/hide the merge_with form
     # @show_merge_with = current_user.profile.label == Profile::ADMIN
-    debugger
     @show_merge_with = current_user.admin?
 
     unless @article.access_by? current_user
